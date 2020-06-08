@@ -1,0 +1,10 @@
+127.0.0.1 - - [26/May/2020:15:47:56 +0700] "GET / HTTP/1.1" 404 709
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:48:02 +0700] "GET /WebBanGiay2/ HTTP/1.1" 500 7886
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:48:02 +0700] "GET /favicon.ico HTTP/1.1" 404 720
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:47 +0700] "GET /WebBanGiay2/admin/khuyenMai HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:47 +0700] "GET /WebBanGiay2/dangNhap HTTP/1.1" 200 4698
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:47 +0700] "GET /WebBanGiay2/resources/js/DangNhap.js HTTP/1.1" 200 1597
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:50 +0700] "POST /WebBanGiay2/cookie HTTP/1.1" 200 14
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:53 +0700] "GET /WebBanGiay2/ HTTP/1.1" 500 7886
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:58 +0700] "GET /WebBanGiay2/admin/khuyenMai HTTP/1.1" 200 6299
+0:0:0:0:0:0:0:1 - - [26/May/2020:15:49:58 +0700] "GET /WebBanGiay2/resources/js/DanhSachKhuyenMaiAdmin.js HTTP/1.1" 200 5374

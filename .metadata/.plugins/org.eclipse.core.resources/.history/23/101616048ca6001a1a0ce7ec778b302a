@@ -1,0 +1,318 @@
+package com.nk.hoadonService.service;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import com.nk.hoadonService.dao.HoaDonDAO;
+import com.nk.hoadonService.dto.ChiTietHoaDonDTO;
+import com.nk.hoadonService.dto.ChiTietSanPhamDTO;
+import com.nk.hoadonService.dto.DanhSachHoaDonDTO;
+import com.nk.hoadonService.dto.HoaDonDTO;
+import com.nk.hoadonService.dto.MauDTO;
+import com.nk.hoadonService.dto.TimKiemHoaDonDTO;
+import com.nk.hoadonService.entity.ChiTietHoaDon;
+import com.nk.hoadonService.entity.HoaDon;
+
+@Service
+public class HoaDonService {
+
+	@Autowired
+	private HoaDonDAO hoaDonDAO;
+	
+	@Autowired
+	private ChiTietSanPhamService chiTietSanPhamService;
+	
+	@Autowired
+	private TaiKhoanService taiKhoanService;
+	
+	@Autowired
+	private HinhAnhService hinhAnhService;
+	
+	public boolean themHoaDon(HoaDonDTO hoaDonDTO) {
+		try {
+			HoaDon hoaDon = chuyenHoaDonDTOSangHoaDon(hoaDonDTO);
+			System.out.println(hoaDon.toString());
+			hoaDonDAO.save(hoaDon);
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public DanhSachHoaDonDTO getHoaDonByIdTaiKhoan(Authentication auth,int n) {
+		int idTaiKhoan = taiKhoanService.getIdTaiKhoanByTenDangNhap(auth);
+		System.out.println(idTaiKhoan);
+		List<HoaDon> hoaDons = hoaDonDAO.getListHoaDonByIdTaiKhoan(n, idTaiKhoan);
+		List<HoaDonDTO> hoaDonDTOs = new ArrayList<HoaDonDTO>();
+		for (HoaDon hoaDon : hoaDons) {
+			if(hoaDon.getTrangThai() <2) {
+				HoaDonDTO hoaDonDTO = chuyenHoaDonSangHoaDonDTO(hoaDon);
+				hoaDonDTOs.add(hoaDonDTO);
+			}
+		}
+		System.out.println(hoaDons.size());
+		DanhSachHoaDonDTO danhSachHoaDon = new DanhSachHoaDonDTO();
+		danhSachHoaDon.setHoaDonDTOs(hoaDonDTOs);
+		if(hoaDons.size()<12) {
+			danhSachHoaDon.setCheck(false);
+		}
+		else {
+			danhSachHoaDon.setCheck(true);
+		}
+		return danhSachHoaDon;
+	}
+	
+	public DanhSachHoaDonDTO getAllHoaDon(int n) {
+		
+		List<HoaDon> hoaDons = hoaDonDAO.getListHoaDon(n);
+		List<HoaDonDTO> hoaDonDTOs = new ArrayList<HoaDonDTO>();
+		for (HoaDon hoaDon : hoaDons) {
+			HoaDonDTO hoaDonDTO = chuyenHoaDonSangHoaDonDTO(hoaDon);
+			hoaDonDTOs.add(hoaDonDTO);
+		}
+		System.out.println(hoaDons.size());
+		DanhSachHoaDonDTO danhSachHoaDon = new DanhSachHoaDonDTO();
+		danhSachHoaDon.setHoaDonDTOs(hoaDonDTOs);
+		if(hoaDons.size()<12) {
+			danhSachHoaDon.setCheck(false);
+		}
+		else {
+			danhSachHoaDon.setCheck(true);
+		}
+		return danhSachHoaDon;
+	}
+	
+	public HoaDonDTO getHoaDonByIdAndIdTaiKhoan(Authentication auth,int id) {
+		int idTaiKhoan = taiKhoanService.getIdTaiKhoanByTenDangNhap(auth);
+		System.out.println(auth.getName());
+		System.out.println(idTaiKhoan);
+		HoaDon hoaDon = hoaDonDAO.getHoaDonByIdTaiKhoan(id, idTaiKhoan);
+		return chuyenHoaDonSangHoaDonDTO(hoaDon);
+	}
+	
+	public DanhSachHoaDonDTO findHoaDon(TimKiemHoaDonDTO timKiemHoaDonDTO,int n) {
+		DanhSachHoaDonDTO danhSachHoaDonDTO = new DanhSachHoaDonDTO();
+		List<HoaDon> hoaDons = hoaDonDAO.findHoaDon(timKiemHoaDonDTO.getNgayBatDau(), timKiemHoaDonDTO.getNgayKetThuc(), timKiemHoaDonDTO.getTrangThai(),n);
+		if(hoaDons.size() <12) {
+			danhSachHoaDonDTO.setCheck(false);
+		}
+		else {
+			danhSachHoaDonDTO.setCheck(true);
+		}
+		List<HoaDonDTO> hoaDonDTOs = new ArrayList<HoaDonDTO>();
+		for (HoaDon hoaDon : hoaDons) {
+			HoaDonDTO hoaDonDTO = chuyenHoaDonSangHoaDonDTO(hoaDon);
+			hoaDonDTOs.add(hoaDonDTO);
+		}
+		danhSachHoaDonDTO.setHoaDonDTOs(hoaDonDTOs);
+		return danhSachHoaDonDTO;
+	}
+	
+	public HoaDonDTO getHoaDonById(int id) {
+		HoaDon hoaDon = hoaDonDAO.getHoaDonById(id);
+		if(hoaDon == null) {
+			return new HoaDonDTO();
+		}
+		return chuyenHoaDonSangHoaDonDTO(hoaDon);
+	}
+	
+	public boolean xoaHoaDonByIdAndIdTaiKhoan(int id,Authentication auth) {
+		
+		try {
+			int idTaiKhoan = taiKhoanService.getIdTaiKhoanByTenDangNhap(auth);
+			System.out.println(idTaiKhoan);
+			HoaDon hoaDon = hoaDonDAO.getHoaDonByIdTaiKhoan(id, idTaiKhoan);
+			hoaDon.setTrangThai(2);
+			hoaDonDAO.save(hoaDon);
+			
+			List<ChiTietHoaDon> chiTietHoaDons = hoaDon.getChiTietHoaDons();
+			for (ChiTietHoaDon chiTietHoaDon : chiTietHoaDons) {
+				ChiTietSanPhamDTO chiTietSanPhamDTO = new ChiTietSanPhamDTO();
+				chiTietSanPhamDTO.setId(chiTietHoaDon.getIdChiTietSanPham());
+				chiTietSanPhamDTO.setSoLuong(chiTietHoaDon.getSoLuong());
+				chiTietSanPhamService.huyHoaDon(chiTietSanPhamDTO);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean thayDoiTrangThaiDoaDon(int trangThai,int id) {
+		
+		try {
+			HoaDon hoaDon = hoaDonDAO.getHoaDonById(id);
+			hoaDon.setTrangThai(trangThai);
+			hoaDonDAO.save(hoaDon);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public int getTongTienByIdTaiKhoan(int idTaiKhoan) {
+		List<HoaDon> hoaDons = hoaDonDAO.getListHoaDonByIdTaiKhoan(idTaiKhoan);
+		int tongTien = 0;
+		for (HoaDon hoaDon : hoaDons) {
+			if(hoaDon.getTrangThai() !=2) {
+				for (ChiTietHoaDon chiTietHoaDon : hoaDon.getChiTietHoaDons()) {
+					tongTien += chiTietHoaDon.getGia() * chiTietHoaDon.getSoLuong();
+				}
+			}
+		}
+		return tongTien;
+	}
+	
+	public DanhSachHoaDonDTO getHoaDonByIdTaiKhoan(int idTaiKhoan,int n) {
+		List<HoaDon> hoaDons = hoaDonDAO.getListHoaDonByIdTaiKhoan(n, idTaiKhoan);
+		List<HoaDonDTO> hoaDonDTOs = new ArrayList<HoaDonDTO>();
+		for (HoaDon hoaDon : hoaDons) {
+				HoaDonDTO hoaDonDTO = chuyenHoaDonSangHoaDonDTO(hoaDon);
+				hoaDonDTOs.add(hoaDonDTO);
+		}
+		DanhSachHoaDonDTO danhSachHoaDon = new DanhSachHoaDonDTO();
+		danhSachHoaDon.setHoaDonDTOs(hoaDonDTOs);
+		if(hoaDons.size()<12) {
+			danhSachHoaDon.setCheck(false);
+		}
+		else {
+			danhSachHoaDon.setCheck(true);
+		}
+		return danhSachHoaDon;
+	}
+	
+	public int getTongTienByNgay(LocalDate date) {
+		int a=0;
+		try {
+			
+			a = hoaDonDAO.getTongTienByNgay(date);
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			a=0;
+		}
+		return a;
+	}
+	
+	public float soSanhHomQua() {
+		 LocalDate today = LocalDate.now();
+		    LocalDate yesterday = today.minusDays(1);
+		int a=0;
+		int b=0;
+		try {
+			a = hoaDonDAO.getTongTienByNgay(today);
+			b = hoaDonDAO.getTongTienByNgay(yesterday);
+			
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			a=0;b=0;
+		}
+		if(a==0||b==0) {
+			return 0;
+		}
+		return ((float) a / (float)b) - 1;
+		
+	}
+	
+	public float soSanhThangTruoc() {
+		 LocalDate today = LocalDate.now();
+		    LocalDate t = today.minus(1,ChronoUnit.MONTHS);
+		    System.out.println(t);
+		int a=0;
+		int b=0;
+		try {
+			a = hoaDonDAO.getTongTienByNgay(today);
+			b = hoaDonDAO.getTongTienByNgay(t);
+			
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			a=0;b=0;
+		}
+		if(a==0||b==0) {
+			return 0;
+		}
+		return ((float) a / (float)b) - 1;
+		
+	}
+
+	
+	private HoaDon chuyenHoaDonDTOSangHoaDon(HoaDonDTO hoaDonDTO) {
+		HoaDon hoaDon = new HoaDon();
+		hoaDon.setDiaChi(hoaDonDTO.getDiaChi());
+		hoaDon.setIdTaiKhoan(hoaDonDTO.getIdTaiKhoan());
+		hoaDon.setNgayMua(hoaDonDTO.getNgayMua());
+		hoaDon.setSdt(hoaDonDTO.getSdt());
+		hoaDon.setTenNguoiNhan(hoaDonDTO.getTenNguoiNhan());
+		hoaDon.setTrangThai(hoaDonDTO.getTrangThai());
+		List<ChiTietHoaDon> chiTietHoaDons = new ArrayList<ChiTietHoaDon>();
+		List<ChiTietHoaDonDTO> chiTietHoaDonDTOs = hoaDonDTO.getChiTietHoaDons();
+		for (ChiTietHoaDonDTO chiTietHoaDonDTO : chiTietHoaDonDTOs) {
+			chiTietHoaDons.add(chuyenChiTietHoaDonDTOSangChiTietHoaDon(chiTietHoaDonDTO, hoaDon));
+		}
+		hoaDon.setChiTietHoaDons(chiTietHoaDons);
+		return hoaDon;
+	}
+	
+	private HoaDonDTO chuyenHoaDonSangHoaDonDTO(HoaDon hoaDon) {
+		HoaDonDTO hoaDonDTO = new HoaDonDTO();
+		hoaDonDTO.setDiaChi(hoaDon.getDiaChi());
+		hoaDonDTO.setId(hoaDon.getId());
+		hoaDonDTO.setIdTaiKhoan(hoaDon.getIdTaiKhoan());
+		hoaDonDTO.setNgayMua(hoaDon.getNgayMua());
+		hoaDonDTO.setSdt(hoaDon.getSdt());
+		hoaDonDTO.setTenNguoiNhan(hoaDon.getTenNguoiNhan());
+		hoaDonDTO.setTrangThai(hoaDon.getTrangThai());
+		List<ChiTietHoaDonDTO> chiTietHoaDonDTOs = new ArrayList<ChiTietHoaDonDTO>();
+		List<ChiTietHoaDon> chiTietHoaDons = hoaDon.getChiTietHoaDons();
+		for (ChiTietHoaDon chiTietHoaDon : chiTietHoaDons) {
+			ChiTietHoaDonDTO chiTietHoaDonDTO = new ChiTietHoaDonDTO();
+			chiTietHoaDonDTO.setGia(chiTietHoaDon.getGia());
+			chiTietHoaDonDTO.setId(chiTietHoaDon.getId());
+			ChiTietSanPhamDTO chiTietSanPhamDTO = chiTietSanPhamService.getChiTietSanPhamById(chiTietHoaDon.getIdChiTietSanPham());
+			chiTietHoaDonDTO.setIdSanPham(chiTietSanPhamDTO.getIdSanPham());
+			chiTietHoaDonDTO.setMauDTO(chiTietSanPhamDTO.getMauDTO());
+			chiTietHoaDonDTO.setSize(chiTietSanPhamDTO.getSize());
+			chiTietHoaDonDTO.setSoLuong(chiTietHoaDon.getSoLuong());
+			chiTietHoaDonDTO.setUrl(hinhAnhService.getHinhAnhByIdSanPhamAndIdMau(chiTietSanPhamDTO.getIdSanPham(), chiTietSanPhamDTO.getMauDTO().getId()));
+			chiTietHoaDonDTO.setTenSanPham(chiTietSanPhamDTO.getTenSanPham());
+			chiTietHoaDonDTOs.add(chiTietHoaDonDTO);
+			
+		}
+		hoaDonDTO.setChiTietHoaDons(chiTietHoaDonDTOs);
+		return hoaDonDTO;
+	}
+	
+	
+	private ChiTietHoaDon chuyenChiTietHoaDonDTOSangChiTietHoaDon(ChiTietHoaDonDTO chiTietHoaDonDTO,HoaDon hoaDon) {
+		ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon();
+		chiTietHoaDon.setGia(chiTietHoaDonDTO.getGia());
+		chiTietHoaDon.setHoaDon(hoaDon);
+		ChiTietSanPhamDTO chiTietSanPhamDTO = new ChiTietSanPhamDTO();
+		chiTietSanPhamDTO.setIdSanPham(chiTietHoaDonDTO.getIdSanPham());
+		MauDTO mauDTO = chiTietHoaDonDTO.getMauDTO();
+		chiTietSanPhamDTO.setMauDTO(mauDTO);
+		chiTietSanPhamDTO.setSize(chiTietHoaDonDTO.getSize());
+		chiTietHoaDon.setIdChiTietSanPham(chiTietSanPhamService.getIDChiTietSanPhamByIdSanPhamAndIdMauAndSize(chiTietSanPhamDTO));
+		chiTietSanPhamDTO.setSoLuong(chiTietHoaDonDTO.getSoLuong());
+		boolean k = chiTietSanPhamService.themHoaDon(chiTietSanPhamDTO);
+		System.out.println(k);
+		chiTietHoaDon.setSoLuong(chiTietHoaDonDTO.getSoLuong());
+		return chiTietHoaDon;
+	}
+	
+}

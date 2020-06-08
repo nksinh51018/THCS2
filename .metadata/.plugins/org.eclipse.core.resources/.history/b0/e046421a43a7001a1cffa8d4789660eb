@@ -1,0 +1,19 @@
+package com.nk.hoadonService.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.nk.hoadonService.dao.ChiTietHoaDonDAO;
+import com.nk.hoadonService.dto.DanhSachChiTietSanPhamTheoDoanhThuDTO;
+
+@Service
+public class ChiTietHoaDonService {
+
+	@Autowired
+	private ChiTietHoaDonDAO chiTietHoaDonDAO;
+	
+	public DanhSachChiTietSanPhamTheoDoanhThuDTO getDanhSachChiTietSanPhamTheoDoanhThu() {
+		DanhSachChiTietSanPhamTheoDoanhThuDTO danhSachChiTietSanPhamTheoDoanhThuDTO = chiTietHoaDonDAO.getDanhSachChiTietSanPhamTheoDoanhThu();
+	}
+	
+}

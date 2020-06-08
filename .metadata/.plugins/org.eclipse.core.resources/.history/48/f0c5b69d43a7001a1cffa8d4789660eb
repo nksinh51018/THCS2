@@ -1,0 +1,9 @@
+package com.nk.hoadonService.dto;
+
+import java.util.List;
+
+public class DanhSachChiTietSanPhamTheoDoanhThuDTO {
+
+	private List<ChiTietSanPhamTheoDoanhThuDTO> chiTietSanPhamTheoDoanhThuDTOs;
+	
+}

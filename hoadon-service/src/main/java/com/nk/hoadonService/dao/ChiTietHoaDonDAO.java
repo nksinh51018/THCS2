@@ -1,0 +1,31 @@
+package com.nk.hoadonService.dao;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import com.nk.hoadonService.dto.ChiTietSanPhamIn;
+import com.nk.hoadonService.entity.ChiTietHoaDon;
+
+@Repository
+public interface ChiTietHoaDonDAO extends CrudRepository<ChiTietHoaDon, Integer>{
+
+	@Query(value = "SELECT idChiTietSanPham,count(SoLuong) * gia as tongTien FROM hoadon.chitiethoadon\r\n" + 
+			"GROUP BY \r\n" + 
+			"    idChiTietSanPham\r\n" + 
+			"order by count(SoLuong) * gia desc\r\n" + 
+			"limit 10",
+			nativeQuery = true)
+	public List<ChiTietSanPhamIn> getDanhSachChiTietSanPhamTheoDoanhThu();
+	
+	@Query(value = "SELECT idChiTietSanPham,count(SoLuong) as SoLuong FROM hoadon.chitiethoadon\r\n" + 
+			"GROUP BY \r\n" + 
+			"    idChiTietSanPham\r\n" + 
+			"order by count(SoLuong) desc\r\n" + 
+			"limit 10",
+			nativeQuery = true)
+	public List<ChiTietSanPhamIn> getDanhSachChiTietSanPhamTheoSoLuong();
+	
+}

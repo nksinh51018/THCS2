@@ -1,0 +1,29 @@
+package com.nk.hoadonService.dto;
+
+public class DanhSachChiTietSanPhamTheoDoanhThuDTO {
+	
+	private ChiTietSanPhamDTO chiTietSanPhamDTO;
+	private int idChiTietSanPhamDto;
+	private int tongTien;
+	public ChiTietSanPhamDTO getChiTietSanPhamDTO() {
+		return chiTietSanPhamDTO;
+	}
+	public void setChiTietSanPhamDTO(ChiTietSanPhamDTO chiTietSanPhamDTO) {
+		this.chiTietSanPhamDTO = chiTietSanPhamDTO;
+	}
+	public int getIdChiTietSanPhamDto() {
+		return idChiTietSanPhamDto;
+	}
+	public void setIdChiTietSanPhamDto(int idChiTietSanPhamDto) {
+		this.idChiTietSanPhamDto = idChiTietSanPhamDto;
+	}
+	public int getTongTien() {
+		return tongTien;
+	}
+	public void setTongTien(int tongTien) {
+		this.tongTien = tongTien;
+	}
+	
+	
+
+}

@@ -1,0 +1,8 @@
+package com.nk.hoadonService.dto;
+
+public class TongTienThang {
+
+	private int thang;
+	private int tongTien;
+	
+}

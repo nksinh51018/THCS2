@@ -1,0 +1,9 @@
+INDEX VERSION 1.131
+C:\Users\NKSinh\Test\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\221850377.index
+\WebBanGiay\src\main\java
+C:\Users\NKSinh\Test\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2299679165.index
+\WebBanGiay2\src\main\java
+C:\Users\NKSinh\Test\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2241858844.index
+\WebBanHang\src\main\java
+C:\Users\NKSinh\Test\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3505149259.index
+\DuAn2\src\main\java

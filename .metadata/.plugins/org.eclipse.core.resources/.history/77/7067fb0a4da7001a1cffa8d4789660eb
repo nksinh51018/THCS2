@@ -1,0 +1,117 @@
+function getCookie(cname) {
+	  var name = cname + "=";
+	  var decodedCookie = decodeURIComponent(document.cookie);
+	  var ca = decodedCookie.split(';');
+	  for(var i = 0; i <ca.length; i++) {
+	    var c = ca[i];
+	    while (c.charAt(0) == ' ') {
+	      c = c.substring(1);
+	    }
+	    if (c.indexOf(name) == 0) {
+	      return c.substring(name.length, c.length);
+	    }
+	  }
+	  return "";
+	}
+function format(n) {
+	  return n.toFixed(0).replace(/./g, function(c, i, a) {
+	    return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "." + c : c;
+	  });
+	}
+$(document).ready(function(){
+	
+	
+	
+	let myChart = document.getElementById('myChart').getContext('2d');
+    // Global Options
+    Chart.defaults.global.defaultFontFamily = 'Lato';
+    Chart.defaults.global.defaultFontSize = 18;
+    Chart.defaults.global.defaultFontColor = '#777';
+
+    $.ajax({
+		url:"http://localhost:8762/hoaDon/admin/hoaDon/tongTien/thang",
+		headers: {
+	        'Authorization': "Bearer "+getCookie("tokenJWT")
+	    },
+		contentType: 'application/json; charset=utf-8',
+		dataType: 'json',
+		type:"GET",
+		
+		success: function(value){
+			
+			var a= [];
+			var b= [];
+			for (var i = 0; i < value.tongTienThangs.length; i++) {
+				console.log(value.tongTienThangs[i])
+				a.unshift(value.tongTienThangs[i].thang)
+				b.unshift(value.tongTienThangs[i].tongTien)
+			}
+			
+			
+			let massPopChart = new Chart(myChart, {
+			      type:'vertical-bar',
+			      data:{
+			        labels:a,
+			        datasets:[{
+			          //label:'Population',
+			          data:b,
+			          //backgroundColor:'green',
+			          backgroundColor:[
+			            'rgba(255, 99, 132, 0.6)',
+			            'rgba(54, 162, 235, 0.6)',
+			            'rgba(255, 206, 86, 0.6)',
+			            'rgba(75, 192, 192, 0.6)',
+			            'rgba(153, 102, 255, 0.6)',
+			            'rgba(255, 159, 64, 0.6)',
+			            'rgba(255, 99, 132, 0.6)'
+			          ],
+			          borderWidth:1,
+			          borderColor:'#777',
+			          hoverBorderWidth:3,
+			          hoverBorderColor:'#000'
+			        }]
+			      },
+			      options:{
+			        title:{
+			          display:true,
+			          text:'Doanh thu các tháng gần đây',
+			          fontSize:25
+			        },
+			        legend:{
+			          display:false,
+			        },
+			        layout:{
+			          padding:{
+			            left:50,
+			            right:0,
+			            bottom:0,
+			            top:0
+			          }
+			        },
+			        tooltips:{
+			        	enable:true,
+			        	callbacks: {
+			                label: function(tooltipItem, data) {
+			                    return format(tooltipItem.yLabel)
+			                }
+			            }
+			        },
+			        
+			        scales: {
+			            yAxes: [{
+			                ticks: {
+			                    beginAtZero:true,
+			                    callback: function(value, index, values) {
+			                        return format(value);
+			                    }
+			                }
+			            }]
+			        },
+			      }
+			    });
+		}
+    })
+    
+		
+
+})

@@ -1,0 +1,31 @@
+package com.nk.hoadonService.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.nk.hoadonService.dao.ChiTietHoaDonDAO;
+import com.nk.hoadonService.dto.ChiTietSanPhamTheoDoanhThuDTO;
+import com.nk.hoadonService.dto.DanhSachChiTietSanPhamTheoDoanhThuDTO;
+
+@Service
+public class ChiTietHoaDonService {
+
+	@Autowired
+	private ChiTietHoaDonDAO chiTietHoaDonDAO;
+	
+	public DanhSachChiTietSanPhamTheoDoanhThuDTO getDanhSachChiTietSanPhamTheoDoanhThu() {
+		
+		List<ChiTietHoaDonDAO> objects = chiTietHoaDonDAO.getDanhSachChiTietSanPhamTheoDoanhThu();
+		for (Object object : objects) {
+			System.out.println(object.toString());
+		}
+		
+		List<ChiTietSanPhamTheoDoanhThuDTO> chiTietSanPhamTheoDoanhThuDTOs =null;
+		DanhSachChiTietSanPhamTheoDoanhThuDTO danhSachChiTietSanPhamTheoDoanhThuDTO = new DanhSachChiTietSanPhamTheoDoanhThuDTO();
+		danhSachChiTietSanPhamTheoDoanhThuDTO.setChiTietSanPhamTheoDoanhThuDTOs(chiTietSanPhamTheoDoanhThuDTOs);
+		return danhSachChiTietSanPhamTheoDoanhThuDTO;
+	}
+	
+}
